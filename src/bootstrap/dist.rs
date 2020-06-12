@@ -688,7 +688,7 @@ impl Step for Std {
     const DEFAULT: bool = true;
 
     fn should_run(run: ShouldRun<'_>) -> ShouldRun<'_> {
-        run.path("src/libstd")
+        run.path("library/std")
     }
 
     fn make_run(run: RunConfig<'_>) {
@@ -1005,20 +1005,20 @@ impl Step for Src {
         // (essentially libstd and all of its path dependencies)
         let std_src_dirs = [
             "src/build_helper",
-            "src/liballoc",
-            "src/libcore",
-            "src/libpanic_abort",
-            "src/libpanic_unwind",
-            "src/libstd",
-            "src/libunwind",
-            "src/libtest",
-            "src/libterm",
-            "src/libprofiler_builtins",
-            "src/stdarch",
-            "src/libproc_macro",
-            "src/tools/rustc-std-workspace-core",
-            "src/tools/rustc-std-workspace-alloc",
-            "src/tools/rustc-std-workspace-std",
+            "library/alloc",
+            "library/core",
+            "library/panic_abort",
+            "library/panic_unwind",
+            "library/std",
+            "library/unwind",
+            "library/test",
+            "library/term",
+            "library/profiler_builtins",
+            "library/stdarch",
+            "library/proc_macro",
+            "library/rustc-std-workspace-core",
+            "library/rustc-std-workspace-alloc",
+            "library/rustc-std-workspace-std",
         ];
 
         copy_src_dirs(builder, &std_src_dirs[..], &[], &dst_src);
@@ -1091,7 +1091,7 @@ impl Step for PlainSourceTarball {
             "Cargo.toml",
             "Cargo.lock",
         ];
-        let src_dirs = ["src"];
+        let src_dirs = ["src", "library"];
 
         copy_src_dirs(builder, &src_dirs[..], &[], &plain_dst_src);
 
