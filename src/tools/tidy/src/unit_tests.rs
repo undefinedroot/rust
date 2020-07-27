@@ -11,8 +11,8 @@ use std::path::Path;
 
 pub fn check(root_path: &Path, bad: &mut bool) {
     let core = &root_path.join("core");
-    let core_tests = &root_path.join("core/tests");
-    let core_benches = &root_path.join("core/benches");
+    let core_tests = &core.join("tests");
+    let core_benches = &core.join("benches");
     let is_core = |path: &Path| {
         path.starts_with(core) && !(path.starts_with(core_tests) || path.starts_with(core_benches))
     };
