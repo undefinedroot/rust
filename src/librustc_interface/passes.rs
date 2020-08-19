@@ -2,10 +2,9 @@ use crate::interface::{Compiler, Result};
 use crate::proc_macro_decls;
 use crate::util;
 
-use log::{info, warn};
 use once_cell::sync::Lazy;
 use rustc_ast::mut_visit::MutVisitor;
-use rustc_ast::{self, ast, visit};
+use rustc_ast::{self as ast, visit};
 use rustc_codegen_ssa::back::link::emit_metadata;
 use rustc_codegen_ssa::traits::CodegenBackend;
 use rustc_data_structures::sync::{par_iter, Lrc, OnceCell, ParallelIterator, WorkerLocal};
@@ -31,7 +30,6 @@ use rustc_passes::{self, hir_stats, layout_test};
 use rustc_plugin_impl as plugin;
 use rustc_resolve::{Resolver, ResolverArenas};
 use rustc_session::config::{CrateType, Input, OutputFilenames, OutputType, PpMode, PpSourceMode};
-use rustc_session::lint;
 use rustc_session::output::{filename_for_input, filename_for_metadata};
 use rustc_session::search_paths::PathKind;
 use rustc_session::Session;
@@ -39,6 +37,7 @@ use rustc_span::symbol::Symbol;
 use rustc_span::{FileName, RealFileName};
 use rustc_trait_selection::traits;
 use rustc_typeck as typeck;
+use tracing::{info, warn};
 
 use rustc_serialize::json;
 use tempfile::Builder as TempFileBuilder;
@@ -104,7 +103,7 @@ pub fn configure_and_expand(
     krate: ast::Crate,
     crate_name: &str,
 ) -> Result<(ast::Crate, BoxedResolver)> {
-    log::trace!("configure_and_expand");
+    tracing::trace!("configure_and_expand");
     // Currently, we ignore the name resolution data structures for the purposes of dependency
     // tracking. Instead we will run name resolution and include its output in the hash of each
     // item, much like we do for macro expansion. In other words, the hash reflects not just
@@ -229,7 +228,7 @@ fn configure_and_expand_inner<'a>(
     resolver_arenas: &'a ResolverArenas<'a>,
     metadata_loader: &'a MetadataLoaderDyn,
 ) -> Result<(ast::Crate, Resolver<'a>)> {
-    log::trace!("configure_and_expand_inner");
+    tracing::trace!("configure_and_expand_inner");
     pre_expansion_lint(sess, lint_store, &krate);
 
     let mut resolver = Resolver::new(sess, &krate, crate_name, metadata_loader, &resolver_arenas);
@@ -307,27 +306,11 @@ fn configure_and_expand_inner<'a>(
             ecx.check_unused_macros();
         });
 
-        let mut missing_fragment_specifiers: Vec<_> = ecx
-            .sess
-            .parse_sess
-            .missing_fragment_specifiers
-            .borrow()
-            .iter()
-            .map(|(span, node_id)| (*span, *node_id))
-            .collect();
-        missing_fragment_specifiers.sort_unstable_by_key(|(span, _)| *span);
-
-        let recursion_limit_hit = ecx.reduced_recursion_limit.is_some();
-
-        for (span, node_id) in missing_fragment_specifiers {
-            let lint = lint::builtin::MISSING_FRAGMENT_SPECIFIER;
-            let msg = "missing fragment specifier";
-            resolver.lint_buffer().buffer_lint(lint, node_id, span, msg);
-        }
         if cfg!(windows) {
             env::set_var("PATH", &old_path);
         }
 
+        let recursion_limit_hit = ecx.reduced_recursion_limit.is_some();
         if recursion_limit_hit {
             // If we hit a recursion limit, exit early to avoid later passes getting overwhelmed
             // with a large AST
@@ -342,7 +325,7 @@ fn configure_and_expand_inner<'a>(
     });
 
     if let Some(PpMode::PpmSource(PpSourceMode::PpmEveryBodyLoops)) = sess.opts.pretty {
-        log::debug!("replacing bodies with loop {{}}");
+        tracing::debug!("replacing bodies with loop {{}}");
         util::ReplaceBodyWithLoop::new(&mut resolver).visit_crate(&mut krate);
     }
 

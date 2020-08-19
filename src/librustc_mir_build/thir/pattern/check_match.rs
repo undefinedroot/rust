@@ -4,7 +4,7 @@ use super::_match::{expand_pattern, is_useful, MatchCheckCtxt, Matrix, PatStack}
 use super::{PatCtxt, PatKind, PatternError};
 
 use rustc_arena::TypedArena;
-use rustc_ast::ast::Mutability;
+use rustc_ast::Mutability;
 use rustc_errors::{error_code, struct_span_err, Applicability, DiagnosticBuilder};
 use rustc_hir as hir;
 use rustc_hir::def::*;
@@ -23,7 +23,7 @@ use std::slice;
 crate fn check_match(tcx: TyCtxt<'_>, def_id: DefId) {
     let body_id = match def_id.as_local() {
         None => return,
-        Some(id) => tcx.hir().body_owned_by(tcx.hir().as_local_hir_id(id)),
+        Some(id) => tcx.hir().body_owned_by(tcx.hir().local_def_id_to_hir_id(id)),
     };
 
     let mut visitor = MatchVisitor {

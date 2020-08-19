@@ -1,12 +1,12 @@
 use super::{Parser, PathStyle};
-use rustc_ast::ast;
+use rustc_ast as ast;
 use rustc_ast::attr;
 use rustc_ast::token::{self, Nonterminal};
 use rustc_ast_pretty::pprust;
 use rustc_errors::{error_code, PResult};
 use rustc_span::Span;
 
-use log::debug;
+use tracing::debug;
 
 #[derive(Debug)]
 pub(super) enum InnerAttrPolicy<'a> {

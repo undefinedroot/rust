@@ -6,7 +6,7 @@
 #![feature(try_blocks)]
 #![feature(or_patterns)]
 
-use rustc_ast::ast;
+use rustc_ast as ast;
 use rustc_ast::token::{self, DelimToken, Nonterminal, Token};
 use rustc_ast::tokenstream::{self, TokenStream, TokenTree};
 use rustc_ast_pretty::pprust;
@@ -20,7 +20,7 @@ use std::mem;
 use std::path::Path;
 use std::str;
 
-use log::{debug, info};
+use tracing::{debug, info};
 
 pub const MACRO_ARGUMENTS: Option<&'static str> = Some("macro arguments");
 

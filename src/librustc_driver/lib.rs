@@ -9,13 +9,13 @@
 #![recursion_limit = "256"]
 
 #[macro_use]
-extern crate log;
+extern crate tracing;
 #[macro_use]
 extern crate lazy_static;
 
 pub extern crate rustc_plugin_impl as plugin;
 
-use rustc_ast::ast;
+use rustc_ast as ast;
 use rustc_codegen_ssa::{traits::CodegenBackend, CodegenResults};
 use rustc_data_structures::profiling::print_time_passes_entry;
 use rustc_data_structures::sync::SeqCst;
@@ -348,8 +348,10 @@ pub fn run_compiler(
             queries.global_ctxt()?;
 
             // Drop AST after creating GlobalCtxt to free memory
-            let _timer = sess.prof.generic_activity("drop_ast");
-            mem::drop(queries.expansion()?.take());
+            {
+                let _timer = sess.prof.generic_activity("drop_ast");
+                mem::drop(queries.expansion()?.take());
+            }
 
             if sess.opts.debugging_opts.no_analysis || sess.opts.debugging_opts.ast_json {
                 return early_exit();
@@ -1224,13 +1226,13 @@ pub fn install_ice_hook() {
 }
 
 /// This allows tools to enable rust logging without having to magically match rustc's
-/// log crate version.
+/// tracing crate version.
 pub fn init_rustc_env_logger() {
     init_env_logger("RUSTC_LOG")
 }
 
 /// This allows tools to enable rust logging without having to magically match rustc's
-/// log crate version. In contrast to `init_rustc_env_logger` it allows you to choose an env var
+/// tracing crate version. In contrast to `init_rustc_env_logger` it allows you to choose an env var
 /// other than `RUSTC_LOG`.
 pub fn init_env_logger(env: &str) {
     // Don't register a dispatcher if there's no filter to print anything

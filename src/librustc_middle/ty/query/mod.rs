@@ -43,14 +43,14 @@ use rustc_hir as hir;
 use rustc_hir::def::DefKind;
 use rustc_hir::def_id::{CrateNum, DefId, DefIdMap, DefIdSet, LocalDefId};
 use rustc_hir::lang_items::{LangItem, LanguageItems};
-use rustc_hir::{Crate, HirIdSet, ItemLocalId, TraitCandidate};
+use rustc_hir::{Crate, ItemLocalId, TraitCandidate};
 use rustc_index::{bit_set::FiniteBitSet, vec::IndexVec};
 use rustc_session::config::{EntryFnType, OptLevel, OutputFilenames, SymbolManglingVersion};
 use rustc_session::utils::NativeLibKind;
 use rustc_session::CrateDisambiguator;
 use rustc_target::spec::PanicStrategy;
 
-use rustc_ast::ast;
+use rustc_ast as ast;
 use rustc_attr as attr;
 use rustc_span::symbol::Symbol;
 use rustc_span::{Span, DUMMY_SP};

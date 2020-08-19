@@ -23,10 +23,10 @@
 use crate::{
     types::CItemKind, EarlyContext, EarlyLintPass, LateContext, LateLintPass, LintContext,
 };
-use rustc_ast::ast::{self, Expr};
 use rustc_ast::attr::{self, HasAttrs};
 use rustc_ast::tokenstream::{TokenStream, TokenTree};
 use rustc_ast::visit::{FnCtxt, FnKind};
+use rustc_ast::{self as ast, *};
 use rustc_ast_pretty::pprust::{self, expr_to_string};
 use rustc_data_structures::fx::{FxHashMap, FxHashSet};
 use rustc_errors::{Applicability, DiagnosticBuilder, DiagnosticStyledString};
@@ -51,8 +51,8 @@ use rustc_trait_selection::traits::misc::can_type_implement_copy;
 
 use crate::nonstandard_style::{method_context, MethodLateContext};
 
-use log::{debug, trace};
 use std::fmt::Write;
+use tracing::{debug, trace};
 
 // hardwired lints from librustc_middle
 pub use rustc_session::lint::builtin::*;
@@ -440,7 +440,7 @@ impl<'tcx> LateLintPass<'tcx> for MissingDoc {
                 // reported for missing docs.
                 let real_trait = trait_ref.path.res.def_id();
                 if let Some(def_id) = real_trait.as_local() {
-                    let hir_id = cx.tcx.hir().as_local_hir_id(def_id);
+                    let hir_id = cx.tcx.hir().local_def_id_to_hir_id(def_id);
                     if let Some(Node::Item(item)) = cx.tcx.hir().find(hir_id) {
                         if let hir::VisibilityKind::Inherited = item.vis.node {
                             for impl_item_ref in items {
@@ -614,7 +614,7 @@ impl<'tcx> LateLintPass<'tcx> for MissingDebugImplementations {
             cx.tcx.for_each_impl(debug, |d| {
                 if let Some(ty_def) = cx.tcx.type_of(d).ty_adt_def() {
                     if let Some(def_id) = ty_def.did.as_local() {
-                        impls.insert(cx.tcx.hir().as_local_hir_id(def_id));
+                        impls.insert(cx.tcx.hir().local_def_id_to_hir_id(def_id));
                     }
                 }
             });
@@ -1057,7 +1057,7 @@ impl TypeAliasBounds {
                     _ => false,
                 }
             }
-            hir::QPath::Resolved(..) => false,
+            hir::QPath::Resolved(..) | hir::QPath::LangItem(..) => false,
         }
     }
 
@@ -1287,7 +1287,7 @@ impl EarlyLintPass for EllipsisInclusiveRangePatterns {
             return;
         }
 
-        use self::ast::{PatKind, RangeEnd, RangeSyntax::DotDotDot};
+        use self::ast::{PatKind, RangeSyntax::DotDotDot};
 
         /// If `pat` is a `...` pattern, return the start and end of the range, as well as the span
         /// corresponding to the ellipsis.
@@ -1860,7 +1860,7 @@ impl<'tcx> LateLintPass<'tcx> for InvalidValue {
         /// Test if this constant is all-0.
         fn is_zero(expr: &hir::Expr<'_>) -> bool {
             use hir::ExprKind::*;
-            use rustc_ast::ast::LitKind::*;
+            use rustc_ast::LitKind::*;
             match &expr.kind {
                 Lit(lit) => {
                     if let Int(i, _) = lit.node {

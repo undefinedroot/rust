@@ -335,6 +335,7 @@ pub fn qpath_to_string(p: &hir::QPath<'_>) -> String {
     let segments = match *p {
         hir::QPath::Resolved(_, ref path) => &path.segments,
         hir::QPath::TypeRelative(_, ref segment) => return segment.ident.to_string(),
+        hir::QPath::LangItem(lang_item, ..) => return lang_item.name().to_string(),
     };
 
     let mut s = String::new();
@@ -471,7 +472,7 @@ pub fn print_const(cx: &DocContext<'_>, n: &'tcx ty::Const<'_>) -> String {
     match n.val {
         ty::ConstKind::Unevaluated(def, _, promoted) => {
             let mut s = if let Some(def) = def.as_local() {
-                let hir_id = cx.tcx.hir().as_local_hir_id(def.did);
+                let hir_id = cx.tcx.hir().local_def_id_to_hir_id(def.did);
                 print_const_expr(cx, cx.tcx.hir().body_owned_by(hir_id))
             } else {
                 inline::print_inlined_const(cx, def.did)

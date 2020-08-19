@@ -12,7 +12,7 @@
 //! initialization and can otherwise silence errors, if
 //! move analysis runs after promotion on broken MIR.
 
-use rustc_ast::ast::LitKind;
+use rustc_ast::LitKind;
 use rustc_hir as hir;
 use rustc_hir::def_id::DefId;
 use rustc_middle::mir::traversal::ReversePostorder;
@@ -101,7 +101,7 @@ impl TempState {
 /// of a larger candidate.
 #[derive(Copy, Clone, PartialEq, Eq, Debug)]
 pub enum Candidate {
-    /// Borrow of a constant temporary.
+    /// Borrow of a constant temporary, candidate for lifetime extension.
     Ref(Location),
 
     /// Promotion of the `x` in `[x; 32]`.

@@ -3,7 +3,7 @@
 
 use std::cell::Cell;
 
-use rustc_ast::ast::Mutability;
+use rustc_ast::Mutability;
 use rustc_data_structures::fx::FxHashSet;
 use rustc_hir::def::DefKind;
 use rustc_hir::HirId;
@@ -67,7 +67,7 @@ impl<'tcx> MirPass<'tcx> for ConstProp {
         }
 
         use rustc_middle::hir::map::blocks::FnLikeNode;
-        let hir_id = tcx.hir().as_local_hir_id(source.def_id().expect_local());
+        let hir_id = tcx.hir().local_def_id_to_hir_id(source.def_id().expect_local());
 
         let is_fn_like = FnLikeNode::from_node(tcx.hir().get(hir_id)).is_some();
         let is_assoc_const = tcx.def_kind(source.def_id()) == DefKind::AssocConst;

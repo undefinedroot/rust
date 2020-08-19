@@ -1,7 +1,7 @@
 use crate::interface::{Compiler, Result};
 use crate::passes::{self, BoxedResolver, QueryContext};
 
-use rustc_ast::{self, ast};
+use rustc_ast as ast;
 use rustc_codegen_ssa::traits::CodegenBackend;
 use rustc_data_structures::sync::{Lrc, OnceCell, WorkerLocal};
 use rustc_errors::ErrorReported;
@@ -168,7 +168,7 @@ impl<'tcx> Queries<'tcx> {
     pub fn expansion(
         &self,
     ) -> Result<&Query<(ast::Crate, Steal<Rc<RefCell<BoxedResolver>>>, Lrc<LintStore>)>> {
-        log::trace!("expansion");
+        tracing::trace!("expansion");
         self.expansion.compute(|| {
             let crate_name = self.crate_name()?.peek().clone();
             let (krate, lint_store) = self.register_plugins()?.take();

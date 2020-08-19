@@ -4,7 +4,7 @@ use crate::mir::{GeneratorLayout, GeneratorSavedLocal};
 use crate::ty::subst::Subst;
 use crate::ty::{self, subst::SubstsRef, ReprOptions, Ty, TyCtxt, TypeFoldable};
 
-use rustc_ast::ast::{self, IntTy, UintTy};
+use rustc_ast::{self as ast, IntTy, UintTy};
 use rustc_attr as attr;
 use rustc_data_structures::stable_hasher::{HashStable, StableHasher};
 use rustc_hir as hir;
@@ -165,7 +165,7 @@ pub const FAT_PTR_ADDR: usize = 0;
 /// - For a slice, this is the length.
 pub const FAT_PTR_EXTRA: usize = 1;
 
-#[derive(Copy, Clone, Debug, RustcEncodable, RustcDecodable)]
+#[derive(Copy, Clone, Debug, TyEncodable, TyDecodable)]
 pub enum LayoutError<'tcx> {
     Unknown(Ty<'tcx>),
     SizeOverflow(Ty<'tcx>),

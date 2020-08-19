@@ -1,9 +1,7 @@
-use log::info;
-use rustc_ast::ast::{AttrVec, BlockCheckMode};
 use rustc_ast::mut_visit::{visit_clobber, MutVisitor, *};
 use rustc_ast::ptr::P;
 use rustc_ast::util::lev_distance::find_best_match_for_name;
-use rustc_ast::{self, ast};
+use rustc_ast::{self as ast, AttrVec, BlockCheckMode};
 use rustc_codegen_ssa::traits::CodegenBackend;
 use rustc_data_structures::fingerprint::Fingerprint;
 use rustc_data_structures::fx::{FxHashMap, FxHashSet};
@@ -33,6 +31,7 @@ use std::path::{Path, PathBuf};
 use std::sync::{Arc, Mutex, Once};
 #[cfg(not(parallel_compiler))]
 use std::{panic, thread};
+use tracing::info;
 
 /// Adds `target_feature = "..."` cfgs for a variety of platform
 /// specific features (SSE, NEON etc.).

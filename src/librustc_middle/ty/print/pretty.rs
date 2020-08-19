@@ -5,7 +5,7 @@ use crate::ty::subst::{GenericArg, GenericArgKind, Subst};
 use crate::ty::{self, ConstInt, DefIdTree, ParamConst, Ty, TyCtxt, TypeFoldable};
 use rustc_apfloat::ieee::{Double, Single};
 use rustc_apfloat::Float;
-use rustc_ast::ast;
+use rustc_ast as ast;
 use rustc_attr::{SignedInt, UnsignedInt};
 use rustc_hir as hir;
 use rustc_hir::def::{CtorKind, DefKind, Namespace};
@@ -610,7 +610,7 @@ pub trait PrettyPrinter<'tcx>:
 
                 // FIXME(eddyb) should use `def_span`.
                 if let Some(did) = did.as_local() {
-                    let hir_id = self.tcx().hir().as_local_hir_id(did);
+                    let hir_id = self.tcx().hir().local_def_id_to_hir_id(did);
                     let span = self.tcx().hir().span(hir_id);
                     p!(write("@{}", self.tcx().sess.source_map().span_to_string(span)));
 
@@ -656,7 +656,7 @@ pub trait PrettyPrinter<'tcx>:
 
                 // FIXME(eddyb) should use `def_span`.
                 if let Some(did) = did.as_local() {
-                    let hir_id = self.tcx().hir().as_local_hir_id(did);
+                    let hir_id = self.tcx().hir().local_def_id_to_hir_id(did);
                     if self.tcx().sess.opts.debugging_opts.span_free_formats {
                         p!(write("@"), print_def_path(did.to_def_id(), substs));
                     } else {

@@ -1,17 +1,19 @@
 use super::ty::{AllowPlus, RecoverQPath};
 use super::{Parser, TokenType};
 use crate::maybe_whole;
-use rustc_ast::ast::{self, AngleBracketedArg, AngleBracketedArgs, GenericArg, ParenthesizedArgs};
-use rustc_ast::ast::{AnonConst, AssocTyConstraint, AssocTyConstraintKind, BlockCheckMode};
-use rustc_ast::ast::{Path, PathSegment, QSelf};
 use rustc_ast::ptr::P;
 use rustc_ast::token::{self, Token};
+use rustc_ast::{
+    self as ast, AngleBracketedArg, AngleBracketedArgs, GenericArg, ParenthesizedArgs,
+};
+use rustc_ast::{AnonConst, AssocTyConstraint, AssocTyConstraintKind, BlockCheckMode};
+use rustc_ast::{Path, PathSegment, QSelf};
 use rustc_errors::{pluralize, Applicability, PResult};
 use rustc_span::source_map::{BytePos, Span};
 use rustc_span::symbol::{kw, sym, Ident};
 
-use log::debug;
 use std::mem;
+use tracing::debug;
 
 /// Specifies how to parse a path.
 #[derive(Copy, Clone, PartialEq)]
